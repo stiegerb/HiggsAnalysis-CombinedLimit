@@ -97,7 +97,7 @@ def doRenameNuisance(datacard, args):
     foundChann, foundProc = False, False
     for lsyst,nofloat,pdf0,args0,errline0 in datacard.systs[:]:
 
-        lsystnew = re.sub(oldname,newname,lsyst)
+        lsystnew = re.sub("^%s$"%oldname,newname,lsyst)
         if lsystnew != lsyst:
             found = False
             errline2 = dict([(b,dict([(p,0) for p in datacard.exp[b]])) for b in datacard.bins])
