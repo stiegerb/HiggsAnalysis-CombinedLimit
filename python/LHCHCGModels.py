@@ -693,6 +693,7 @@ class KappaVKappaT(LHCHCGBaseModel):
     def doParametersOfInterest(self):
         """Create POI out of signal strength and MH"""
         self.modelBuilder.doVar("r[1,0.0,10.0]")
+        self.modelBuilder.doVar("r_others[1]") # non tH/ttH productions that will remain fixed in the fit
         self.modelBuilder.doVar("kappa_V[1,0.0,2.0]")
         self.modelBuilder.doVar("kappa_t[1,-10.0,10.0]")
         self.modelBuilder.doVar("kappa_mu[1,0.0,5.0]")
@@ -809,7 +810,7 @@ class KappaVKappaT(LHCHCGBaseModel):
                 b2gs = "CMS_bbH_scaler_%s" % energy
                 self.modelBuilder.factory_('expr::%s("(%s + @1*@1*@2*@3)*@4", %s, kappa_b, %s, %s, c7_BRscal_%s)' % (name, XSscal[0], XSscal[1], b2g, b2gs, BRscal))
             else:
-                self.modelBuilder.factory_('expr::%s("%s*@1*@2", %s, c7_BRscal_%s,r)' % (name, XSscal[0], XSscal[1], BRscal))
+                self.modelBuilder.factory_('expr::%s("%s*@1*@2", %s, c7_BRscal_%s,r_others)' % (name, XSscal[0], XSscal[1], BRscal))
             print '[LHC-HCG Kappas]', name, production, decay, energy,": ",
             self.modelBuilder.out.function(name).Print("")
         return name
