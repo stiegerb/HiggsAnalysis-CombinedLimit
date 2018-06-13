@@ -676,14 +676,19 @@ class KappaVKappaT(LHCHCGBaseModel):
     Copy of Kappas model with a combined kappa_V (for kappa_W and kappa_Z),
     and where hcc is independent of kappa_t.
 
-    For tHq multilepton analysis (HIG-17-005)
+    For tHq multilepton analysis (HIG-17-005) we used K6 (i.e. resolved=False, 
+    coupleTopTau=True, coupleTHTTH=True)
+
+    For combined tHq paper (HIG-18-009) plan to use K5 (i.e. resolved=True, 
+    coupleTopTau=False, coupleTHTTH=True)
     """
-    def __init__(self,resolved=True,BRU=True,addInvisible=False,coupleTopTau=False):
+    def __init__(self,resolved=True,BRU=True,addInvisible=False,coupleTopTau=False,coupleTHTTH=True):
         LHCHCGBaseModel.__init__(self) # not using 'super(x,self).__init__' since I don't understand it
         self.doBRU = BRU
         self.resolved = resolved
         self.addInvisible = addInvisible
         self.coupleTopTau = coupleTopTau
+        self.coupleTHTTH = coupleTHTTH
     def setPhysicsOptions(self,physOptions):
         self.setPhysicsOptionsBase(physOptions)
         for po in physOptions:
@@ -803,8 +808,13 @@ class KappaVKappaT(LHCHCGBaseModel):
             if not self.modelBuilder.out.function("c7_BRscal_"+BRscal):
                 raise RuntimeError, "Decay mode %s not supported" % decay
             if decay == "hss": BRscal = "hbb"
-            if production in ['tHq', 'tHW', 'ttH']:
+            if production in ['tHq', 'tHW']:
                 self.modelBuilder.factory_('expr::%s("%s*@1*@2", %s, c7_BRscal_%s, r)' % (name, XSscal[0], XSscal[1], BRscal))
+            elif production == 'ttH':
+                if self.coupleTHTTH:
+                    self.modelBuilder.factory_('expr::%s("%s*@1*@2", %s, c7_BRscal_%s, r)' % (name, XSscal[0], XSscal[1], BRscal))
+                else:
+                    self.modelBuilder.factory_('expr::%s("%s*@1*@2", %s, c7_BRscal_%s, r_others)' % (name, XSscal[0], XSscal[1], BRscal))
             elif production == "ggH" and (decay in self.add_bbH) and energy in ["7TeV","8TeV","13TeV","14TeV"]:
                 b2g = "CMS_R_bbH_ggH_%s_%s[%g]" % (decay, energy, 0.01)
                 b2gs = "CMS_bbH_scaler_%s" % energy
@@ -1182,7 +1192,11 @@ L2 = LambdasReduced()
 L2flipped = LambdasReduced(flipped=True)
 D1 = CommonMatrixModel()
 
-K4 = KappaVKappaT(resolved=True)
-K5 = KappaVKappaT(resolved=False)
-K6 = KappaVKappaT(resolved=False, coupleTopTau=True)
-K7 = KappaVKappaT(resolved=True, coupleTopTau=True)
+K4  = KappaVKappaT(resolved=False)
+K4b = KappaVKappaT(resolved=False, coupleTHTTH=False)
+K5  = KappaVKappaT(resolved=True)
+K5b = KappaVKappaT(resolved=True, coupleTHTTH=False)
+K6  = KappaVKappaT(resolved=False, coupleTopTau=True)
+K6b = KappaVKappaT(resolved=False, coupleTopTau=True, coupleTHTTH=False)
+K7  = KappaVKappaT(resolved=True, coupleTopTau=True)
+K7b = KappaVKappaT(resolved=True, coupleTopTau=True, coupleTHTTH=False)
