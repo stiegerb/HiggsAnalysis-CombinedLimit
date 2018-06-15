@@ -189,6 +189,7 @@ toymcoptutils::SinglePdfGenInfo::generateWithHisto(RooRealVar *&weightVar, bool 
     if (observables_.getSize() > 3) throw std::invalid_argument(std::string("ERROR in SinglePdfGenInfo::generateWithHisto for ") + pdf_->GetName() + ", more than 3 observable");
     RooArgList obs(observables_);
     RooRealVar *x = (RooRealVar*)obs.at(0);
+    x->setBins(x->getBins()*2); // FIXME hacking to get finer binning for hgg Asimov in tHq analysis
     RooRealVar *y = obs.getSize() > 1 ? (RooRealVar*)obs.at(1) : 0;
     RooRealVar *z = obs.getSize() > 2 ? (RooRealVar*)obs.at(2) : 0;
     if (weightVar == 0) weightVar = new RooRealVar("_weight_","",1.0);
